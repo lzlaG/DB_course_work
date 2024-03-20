@@ -1,5 +1,0 @@
-CREATE TABLE test
-(
-    Id SERIAL PRIMARY KEY,
-    FirstName CHARACTER VARYING(30)
-);
