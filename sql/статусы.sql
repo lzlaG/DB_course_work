@@ -1,0 +1,5 @@
+CREATE TABLE Cтатус
+(
+    Id SERIAL PRIMARY KEY,
+    Статус VARCHAR(20)
+);
