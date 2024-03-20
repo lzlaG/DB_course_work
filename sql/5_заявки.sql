@@ -5,6 +5,6 @@ CREATE TABLE Заявки
     Дата DATE,
     Исполнитель INTEGER NOT NULL REFERENCES Личные_данные(Id),
     Отвественный INTEGER NOT NULL REFERENCES Личные_данные(Id),
-    Статус INTEGER NOT NULL REFERENCES Cтатус(Id),
+    Статус INTEGER NOT NULL REFERENCES Статус(Id),
     Тип_работы INTEGER NOT NULL REFERENCES Типы_работ(Id)
 );
