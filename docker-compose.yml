@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   postgres:
+    container_name: POSTGRESQL
     image: postgres:16.2
     environment:
       POSTGRES_DB: "DB_completed_tasks"
