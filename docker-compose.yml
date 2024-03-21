@@ -5,7 +5,7 @@ services:
     image: postgres:16.2
     environment:
       POSTGRES_DB: "DB_completed_tasks"
-      POSTGRES_USER: "amogus"
+      POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "a1m40sdf"
     volumes:
       - ./sql:/docker-entrypoint-initdb.d

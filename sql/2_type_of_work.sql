@@ -1,5 +1,5 @@
 CREATE TABLE Типы_работ
 (
-    Id SERIAL PRIMARY KEY,
+    Id_типа_работ INTEGER PRIMARY KEY,
     Наименование VARCHAR(50)
 );
