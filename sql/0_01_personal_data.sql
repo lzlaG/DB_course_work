@@ -3,9 +3,9 @@ CREATE TABLE Личные_данные
 (
     Id_сотрудника INTEGER PRIMARY KEY,
     Пол VARCHAR(1) NOT NULL,
-    Имя VARCHAR(30) NOT NULL,
     Фамилия VARCHAR(30) NOT NULL,
+    Имя VARCHAR(30) NOT NULL,
     Отчество VARCHAR(30),
     Email VARCHAR(30),
-    Телефон VARCHAR(10)
+    Телефон VARCHAR(21)
 );

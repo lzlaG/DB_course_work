@@ -9,5 +9,6 @@ services:
       POSTGRES_PASSWORD: "a1m40sdf"
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
+      - ./data/pers_data.csv:/my_data/pers_data.csv
     ports: 
       - "4903:5432"
