@@ -7,5 +7,8 @@ CREATE TABLE Личные_данные
     Имя VARCHAR(30) NOT NULL,
     Отчество VARCHAR(30),
     Email VARCHAR(30),
-    Телефон VARCHAR(21)
+    Телефон VARCHAR(21),
+    Должность VARCHAR(30),
+    Компетенция INTEGER,
+    Id_отдела INTEGER NOT NULL REFERENCES Отделы(Id_отдела)
 );
