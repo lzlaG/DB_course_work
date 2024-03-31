@@ -10,5 +10,6 @@ services:
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
       - ./data/pers_data.csv:/my_data/pers_data.csv
+      - ./data/task_data.csv:/my_data/task_data.csv
     ports: 
       - "4903:5432"
