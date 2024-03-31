@@ -1,0 +1,1 @@
+COPY Выполнение FROM '/my_data/complete_data.csv' DELIMITER ',' CSV HEADER;

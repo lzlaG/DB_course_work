@@ -19,7 +19,7 @@ with open('./data/pers_data.csv', 'w') as csvfile: #записываем дан�
     for i in range (5):
         writer.writerow(pers_data(i))
 
-def Tasks(id):
+def Tasks(id): 
     task_list = [ #перечисление видов работ
         'Комплексное техническое обслуживание',
         'Диагностика и ремонт электроники автомобиля',
@@ -46,3 +46,10 @@ with open('./data/task_data.csv', 'w') as csvfile: #записываем зая�
     writer.writerow(['Id_заявки', 'Наименование', 'Дата', 'Тип_работы', 'Статус'])
     for i in range (15):
         writer.writerow(Tasks(i))
+
+with open('./data/complete_data.csv', 'w') as csvfile: #записываем заявки  в csv файл
+    writer = csv.writer(csvfile)
+    writer.writerow(['Id_заявки', 'Id_Сотрудника', 'Роль_сотрудника'])
+    for i in range (15):
+        writer.writerow([i+1, random.randint(1,5), 1])
+        writer.writerow([i+1, random.randint(1,5), 2])
