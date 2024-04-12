@@ -2,7 +2,7 @@ host = "127.0.0.1"
 user = "admin"
 password = "a1m40sdf"
 db_name = "DB_completed_tasks"
-#port = "4903"
+port = 4903
 
 '''
 environment:
