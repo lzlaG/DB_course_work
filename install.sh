@@ -20,8 +20,8 @@ else
 fi
 if [ $task_data -eq 1 ] && [ $pers_data -eq 1 ] && [ $complete_data -eq 1 ]; then
     echo "все данные на месте, переходим к установке"
-    docker-compose build
-    docker-compose up -d
+    docker compose build
+    docker compose up -d
     echo "установка завершена"
 else
     echo "нехватка данных"
