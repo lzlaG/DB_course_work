@@ -2,32 +2,71 @@ import tkinter as tk
 from tkinter import ttk
 import psycopg2
 from tkinter import messagebox
-from config import host, user, password, db_name, port
+from config import host, db_name, port #Убираем логин и пароль, для ввода его пользователем 
 
 class PostgreSQLApp:
     def __init__(self, root):
 
         self.root = root
         self.root.title("PostgreSQL GUI App")
+        self.root.geometry("500x350")
+         # виджет для ввода имени пользователя и пароля
+        self.user_label = tk.Label(self.root, text="User:")
+        self.user_label.pack()
+        self.user_entry = tk.Entry(self.root)
+        self.user_entry.pack()
 
-        self.connection = psycopg2.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=db_name,
-            port=port
-        )
-        self.cursor = self.connection.cursor()
+        self.password_label = tk.Label(self.root, text="Password:")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(self.root, show="*")  # чтобы скрыть введенные символы
+        self.password_entry.pack()
+
+        # Кнопка для подключения к базе данных
+        self.connect_button = tk.Button(self.root, text="Connect", command=self.connect_to_database)
+        self.connect_button.pack()
 
         self.selected_code = None
 
+    def connect_to_database(self):
+        # Получаем значения из виджетов Entry
+        user = self.user_entry.get()
+        password = self.password_entry.get()
+
+        # Здесь вы можете использовать user и password для подключения к базе данных
+        try:
+            self.connection = psycopg2.connect(
+                host=host,
+                user=user,
+                password=password,
+                database=db_name,
+                port=port
+            )
+            self.cursor = self.connection.cursor()
+            print("Connected to the database!")
+            self.user_label.pack_forget()
+            self.user_entry.pack_forget()
+            self.password_label.pack_forget()
+            self.password_entry.pack_forget()
+            self.connect_button.pack_forget()
+            self.connect_button.destroy()
+
+        except psycopg2.Error as e:
+            print("Error connecting to the database:", e)
+
+        self.selected_code = None
         self.create_choice_buttons()
 
     def create_choice_buttons(self):
-        self.code1_button = tk.Button(self.root, text="Код 1", command=self.load_code_1)
+        # Уничтожаем предыдущие кнопки, если они существуют
+        if hasattr(self, "code1_button"):
+            self.code1_button.destroy()
+        if hasattr(self, "code2_button"):
+            self.code2_button.destroy()
+        # Создаем новые кнопки
+        self.code1_button = tk.Button(self.root, text="Существующие таблицы", command=self.load_code_1)
         self.code1_button.pack()
 
-        self.code2_button = tk.Button(self.root, text="Код 2", command=self.load_code_2)
+        self.code2_button = tk.Button(self.root, text="Запросы", command=self.load_code_2)
         self.code2_button.pack()
 
     def load_code_1(self):
@@ -65,8 +104,6 @@ class PostgreSQLApp:
         self.back_button.pack()
 
     def load_code2_widgets(self):
-        self.query_label = ttk.Label(self.root, text="Введите SQL-запрос:")
-        self.query_label.pack()
         self.query_label = tk.Label(root, text="Введите SQL-запрос:")
         self.query_label.pack()
 
@@ -136,8 +173,9 @@ class PostgreSQLApp:
             tk.messagebox.showerror("Ошибка", f"Ошибка при получении данных таблицы: {ex}")
 
 # Создание экземпляра основного окна
-root = tk.Tk()
-app = PostgreSQLApp(root)
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PostgreSQLApp(root)
 
-# Запуск главного цикла программы
-root.mainloop()
+    # Запуск главного цикла программы
+    root.mainloop()
