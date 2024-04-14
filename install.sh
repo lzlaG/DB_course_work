@@ -31,8 +31,8 @@ else
         echo "обновляем данные"
         python3 ./data/data.py
         echo "данные обновлены, переходим к установке"
-        docker-compose build
-        docker-compose up -d
+        docker compose build
+        docker compose up -d
         echo "установка завершена"
     else
         echo "ошибка,для запуска необходимы данные"

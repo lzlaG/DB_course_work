@@ -1,0 +1,5 @@
+CREATE OR REPLACE TRIGGER archieve 
+BEFORE UPDATE ON Заявки
+FOR EACH ROW
+WHEN ( NEW.Статус = 3)
+EXECUTE FUNCTION write_to_archieve();

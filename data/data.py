@@ -38,7 +38,7 @@ def Tasks(id):
         'Тюнинг и модификация автомобиля'
     ]
     random_work = fake.word(ext_word_list=task_list) # выбираем рандомную работу
-    return [id+1,random_work,fake.date(),random.randint(1,5),random.randint(1,3)] 
+    return [id+1,random_work,fake.date(),random.randint(1,5),random.randint(1,2)] 
 
 
 with open('./data/task_data.csv', 'w') as csvfile: #записываем заявки  в csv файл

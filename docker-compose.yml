@@ -1,4 +1,4 @@
-version: "3.9"
+name: coursework
 services:
   postgres:
     container_name: POSTGRESQL
