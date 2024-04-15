@@ -8,8 +8,12 @@ class PostgreSQLApp:
     def __init__(self, root):
 
         self.root = root
-        self.root.title("PostgreSQL GUI App")
-        self.root.geometry("500x350")
+        self.root.title("GUI Panel")
+        self.root.geometry("500x500")
+        self.main_frame = ttk.Frame(self.root)
+        self.main_frame.pack(pady=20)
+        self.title_label = ttk.Label(self.main_frame, text="PostgreSQL GUI App", font=("Helvetica", 18))
+        self.title_label.grid(row=0, column=0, columnspan=2, pady=10)
          # виджет для ввода имени пользователя и пароля
         self.user_label = tk.Label(self.root, text="User:")
         self.user_label.pack()
@@ -24,7 +28,6 @@ class PostgreSQLApp:
         # Кнопка для подключения к базе данных
         self.connect_button = tk.Button(self.root, text="Connect", command=self.connect_to_database)
         self.connect_button.pack()
-
         self.selected_code = None
 
     def connect_to_database(self):
@@ -32,7 +35,7 @@ class PostgreSQLApp:
         user = self.user_entry.get()
         password = self.password_entry.get()
 
-        # Здесь вы можете использовать user и password для подключения к базе данных
+        # Здесь используем user и password для подключения к базе данных
         try:
             self.connection = psycopg2.connect(
                 host=host,
@@ -62,12 +65,18 @@ class PostgreSQLApp:
             self.code1_button.destroy()
         if hasattr(self, "code2_button"):
             self.code2_button.destroy()
+        if hasattr(self, "code3_button"):
+            self.code3_button.destroy()
+
         # Создаем новые кнопки
         self.code1_button = tk.Button(self.root, text="Существующие таблицы", command=self.load_code_1)
         self.code1_button.pack()
 
         self.code2_button = tk.Button(self.root, text="Запросы", command=self.load_code_2)
         self.code2_button.pack()
+
+        self.code3_button = tk.Button(self.root, text="Номер телефона", command=self.load_code_3)
+        self.code3_button.pack()
 
     def load_code_1(self):
         self.selected_code = 1
@@ -79,29 +88,60 @@ class PostgreSQLApp:
         self.clear_root()
         self.load_code2_widgets()
 
+    def load_code_3(self):
+        self.selected_code = 3
+        self.clear_root()
+        self.load_code3_widgets()
+
+    #УНИЧТОЖЕНИЕ
     def clear_root(self):
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    def load_code1_widgets(self):
-        self.tables_label = ttk.Label(self.root, text="Существующие таблицы:")
-        self.tables_label.pack()
-        self.tables_label.pack()
+    def load_code3_widgets(self):
+        self.label = tk.Label(root, text="Выберите число:")
+        self.label.pack(pady=10)
 
-        self.tables_combobox = ttk.Combobox(root, state="readonly", width=47)
-        self.tables_combobox.pack()
+        # Создание ползунка
+        self.scale = tk.Scale(root, from_=0, to=9_999_999_9999, orient=tk.HORIZONTAL)
+        self.scale.pack(fill=tk.X, padx=20)
 
-        self.show_tables_button = tk.Button(root, text="Показать таблицы", command=self.populate_tables_combobox)
-        self.show_tables_button.pack()
-
-        self.show_table_button = tk.Button(root, text="Показать содержимое таблицы", command=self.show_table)
-        self.show_table_button.pack()
-
-        self.table_data_text = tk.Text(root, height=10, width=50)
-        self.table_data_text.pack()
+        # Кнопка для отображения выбранного числа. Сомнительное предназначенние 
+        self.button = tk.Button(root, text="Показать число", command=self.show_number)
+        self.button.pack(pady=10)
 
         self.back_button = tk.Button(self.root, text="Назад", command=self.create_choice_buttons)
-        self.back_button.pack()
+        self.back_button.pack(pady=10) 
+
+    def show_number(self):
+        selected_number = self.scale.get()
+        messagebox.showinfo("Выбранное число", f"Выбранное число: {selected_number}")
+ 
+
+    def load_code1_widgets(self):
+        # Создание виджета с названием таблиц
+        self.tables_label = ttk.Label(self.root, text="Существующие таблицы:", font=("Helvetica", 12, "bold"))
+        self.tables_label.pack(pady=(10, 5))  # Добавляем немного отступа между виджетами
+
+        # Выпадающий список для выбора таблиц
+        self.tables_combobox = ttk.Combobox(self.root, state="readonly", width=40)
+        self.tables_combobox.pack(pady=5)
+
+        # Кнопка для отображения списка таблиц
+        self.show_tables_button = tk.Button(self.root, text="Показать таблицы", command=self.populate_tables_combobox)
+        self.show_tables_button.pack(pady=5)
+
+        # Кнопка для отображения содержимого выбранной таблицы
+        self.show_table_button = tk.Button(self.root, text="Показать содержимое таблицы", command=self.show_table)
+        self.show_table_button.pack(pady=5)
+
+        # Текстовое поле для отображения данных таблицы
+        self.table_data_text = tk.Text(self.root, height=10, width=50)
+        self.table_data_text.pack(pady=5)
+
+        # Кнопка "Назад" для возвращения к предыдущему экрану
+        self.back_button = tk.Button(self.root, text="Назад", command=self.create_choice_buttons)
+        self.back_button.pack(pady=10)
 
     def load_code2_widgets(self):
         self.query_label = tk.Label(root, text="Введите SQL-запрос:")
@@ -140,16 +180,6 @@ class PostgreSQLApp:
             self.result_text.insert(tk.END, results)
         except Exception as ex:
             tk.messagebox.showerror("Ошибка", f"Ошибка при выполнении запроса: {ex}")
-    def populate_tables_combobox(self):
-        try:
-            with self.connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
-                )
-                tables = cursor.fetchall()
-                self.tables_combobox["values"] = [table[0] for table in tables]
-        except Exception as ex:
-            tk.messagebox.showerror("Ошибка", f"Ошибка при получении списка таблиц: {ex}")
 
     def show_table(self):
         selected_table = self.tables_combobox.get()
