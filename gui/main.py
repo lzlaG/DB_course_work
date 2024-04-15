@@ -103,7 +103,7 @@ class PostgreSQLApp:
         self.label.pack(pady=10)
 
         # Создание ползунка
-        self.scale = tk.Scale(root, from_=0, to=9_999_999_9999, orient=tk.HORIZONTAL)
+        self.scale = tk.Scale(root, from_=1_000_000_0000, to=9_999_999_9999, orient=tk.HORIZONTAL)
         self.scale.pack(fill=tk.X, padx=20)
 
         # Кнопка для отображения выбранного числа. Сомнительное предназначенние 
@@ -136,7 +136,7 @@ class PostgreSQLApp:
         self.show_table_button.pack(pady=5)
 
         # Текстовое поле для отображения данных таблицы
-        self.table_data_text = tk.Text(self.root, height=10, width=50)
+        self.table_data_text = tk.Text(self.root, height=20, width=100)
         self.table_data_text.pack(pady=5)
 
         # Кнопка "Назад" для возвращения к предыдущему экрану
