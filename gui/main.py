@@ -80,6 +80,11 @@ class PostgreSQLApp(tk.Frame):
         self.selected_code = None
         self.create_choice_buttons()
 
+        #УНИЧТОЖЕНИЕ
+    def clear_root(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
     def create_choice_buttons(self):
         # Уничтожаем предыдущие кнопки, если они существуют
         if hasattr(self, "code1_button"):
@@ -88,7 +93,7 @@ class PostgreSQLApp(tk.Frame):
             self.code2_button.destroy()
         if hasattr(self, "code3_button"):
             self.code3_button.destroy()
-
+        self.clear_root()
         # Создаем новые кнопки
         self.code1_button = tk.Button(self.root, text="Существующие таблицы", command=self.load_code_1)
         self.code1_button.pack()
@@ -113,11 +118,6 @@ class PostgreSQLApp(tk.Frame):
         self.selected_code = 3
         self.clear_root()
         self.load_code3_widgets()
-
-    #УНИЧТОЖЕНИЕ
-    def clear_root(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
 
     def load_code3_widgets(self):
         self.label = tk.Label(root, text="Выберите число:")
