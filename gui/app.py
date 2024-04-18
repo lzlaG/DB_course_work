@@ -34,10 +34,13 @@ with psycopg2.connect(
                 port=port
             ) as connection:
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Заявки")
-    data = (row for row in cursor.fetchall())
+    cursor.execute('SELECT * FROM Заявки LIMIT 0')
+    column_names = [desc[0] for desc in cursor.description]
+    blabla = connection.cursor()
+    blabla.execute ('SELECT * FROM Заявки')
+    data = (row for row in blabla.fetchall())
 
 root = tk.Tk()
-table = Table(root, headings=('id_заявки', 'Наименование', 'Дата', 'Тип_работы', 'Статус'), rows=data)
+table = Table(root, headings = column_names, rows=data)
 table.pack(expand=tk.YES, fill=tk.BOTH)
 root.mainloop()

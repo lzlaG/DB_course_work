@@ -4,7 +4,28 @@ import psycopg2
 from tkinter import messagebox
 from config import host, db_name, port #Убираем логин и пароль, для ввода его пользователем 
 
-class PostgreSQLApp:
+
+class Table(tk.Frame):
+    def __init__(self, parent=None, headings=tuple(), rows=tuple()):
+        super().__init__(parent)
+  
+        table = ttk.Treeview(self, show="headings", selectmode="browse")
+        table["columns"] = headings
+        table["displaycolumns"] = headings
+  
+        for head in headings:
+            table.heading(head, text=head, anchor=tk.CENTER)
+            table.column(head, anchor=tk.CENTER)
+  
+        for row in rows:
+            table.insert('', tk.END, values=tuple(row))
+  
+        scrolltable = tk.Scrollbar(self, command=table.yview)
+        table.configure(yscrollcommand=scrolltable.set)
+        scrolltable.pack(side=tk.RIGHT, fill=tk.Y)
+        table.pack(expand=tk.YES, fill=tk.BOTH)
+
+class PostgreSQLApp(tk.Frame):
     def __init__(self, root):
 
         self.root = root
@@ -136,8 +157,8 @@ class PostgreSQLApp:
         self.show_table_button.pack(pady=5)
 
         # Текстовое поле для отображения данных таблицы
-        self.table_data_text = tk.Text(self.root, height=20, width=100)
-        self.table_data_text.pack(pady=5)
+        #self.table_data_text = tk.Text(self.root, height=20, width=100)
+        #self.table_data_text.pack(pady=5)
 
         # Кнопка "Назад" для возвращения к предыдущему экрану
         self.back_button = tk.Button(self.root, text="Назад", command=self.create_choice_buttons)
@@ -186,22 +207,21 @@ class PostgreSQLApp:
         if not selected_table:
             tk.messagebox.showwarning("Предупреждение", "Выберите таблицу для просмотра.")
             return
-
         try:
-            with self.connection.cursor() as cursor:
-                cursor.execute(f"SELECT * FROM {selected_table};")
-                table_data = cursor.fetchall()
-
-                self.table_data_text.delete(1.0, tk.END)
-
-                if table_data:
-                    for row in table_data:
-                        self.table_data_text.insert(tk.END, str(row) + "\n")
-                else:
-                    self.table_data_text.insert(tk.END, "Таблица пуста.")
+            self.clear_root()
+            data = ()
+            cursor = self.connection.cursor()
+            cursor.execute(f"SELECT * FROM {selected_table} LIMIT 0;")
+            column_names = [desc[0] for desc in cursor.description]
+            new_cur = self.connection.cursor()
+            new_cur.execute (f"SELECT * FROM {selected_table};")
+            data = (row for row in new_cur.fetchall())
+            table = Table(self.root, headings = column_names, rows=data)
+            table.pack(expand=tk.YES, fill=tk.BOTH)
+            self.back_button = tk.Button(self.root, text="Назад", command=self.create_choice_buttons)
+            self.back_button.pack()
         except Exception as ex:
             tk.messagebox.showerror("Ошибка", f"Ошибка при получении данных таблицы: {ex}")
-
 # Создание экземпляра основного окна
 if __name__ == "__main__":
     root = tk.Tk()
