@@ -96,7 +96,6 @@ class PostgreSQLApp(tk.Frame):
     def show_table_data(self, table_name):
         self.clear_widgets()
         try:
-            # Выполнение запроса для получения данных из выбранной таблицы
             self.cursor.execute(f"SELECT * FROM {table_name}")
             columns = [desc[0] for desc in self.cursor.description]
             rows = self.cursor.fetchall()
@@ -117,70 +116,109 @@ class PostgreSQLApp(tk.Frame):
             scrollbar.pack(side='right', fill='y')
             table.pack(expand=True, fill='both')
 
-            # Улучшенная кнопка "Назад", возвращающая пользователя к выбору таблицы
-            ttk.Button(self.root, text="Назад", command=self.view_tables).pack(pady=10)
+            def update_record():
+                selected_item = table.selection()
+                if selected_item:
+                    data = table.item(selected_item)['values']
+                    edit_window = tk.Toplevel(self.root)
+                    self.display_edit_window(edit_window, data, table_name, selected_item, columns)  # Добавлено columns
+                    self.display_edit_window(edit_window, data, table_name, selected_item, columns)  # Добавлено columns
+
+            def delete_record():
+                selected_item = table.selection()
+                if selected_item:
+                    data = table.item(selected_item)['values']
+                    try:
+                        delete_query = f"DELETE FROM {table_name} WHERE {columns[0]} = %s"
+                        self.cursor.execute(delete_query, (data[0],))
+                        self.connection.commit()
+                        table.delete(selected_item)
+                        messagebox.showinfo("Success", "Record Deleted Successfully")
+                    except Exception as e:
+                        messagebox.showerror("Error", str(e))
+
+            ttk.Button(self.root, text="Изменение записи", command=update_record).pack(pady=10)
+            ttk.Button(self.root, text="Удаление записи", command=delete_record).pack(pady=10)
+            ttk.Button(self.root, text="Назад", command=lambda: self.view_tables()).pack(pady=10)
         except Exception as e:
-            messagebox.showerror("Ошибка базы данных", str(e))
+            messagebox.showerror("Database Error", str(e))
+
+    def display_edit_window(self, edit_window, data, table_name, tree_item, columns):
+        edit_window.title("Изменение записи")
+        entries = {}
+        for index, value in enumerate(data):
+            ttk.Label(edit_window, text=columns[index]).pack()
+            entry = ttk.Entry(edit_window)
+            entry.pack()
+            entry.insert(0, value)
+            entries[columns[index]] = entry
+
+        def save_changes():
+            values = [entry.get() for entry in entries.values()]
+            # Подготовка SQL запроса для обновления записи
+            set_clause = ', '.join([f"{col}= %s" for col in columns])
+            where_clause = f"{columns[0]} = %s"  # Предполагаем, что первый столбец - это первичный ключ
+            update_query = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause}"
+            values.append(data[0])  # Добавляем первичный ключ в конец списка значений для WHERE условия
+            try:
+                self.cursor.execute(update_query, values)
+                self.connection.commit()
+                messagebox.showinfo("Success", "Record Updated Successfully")
+                edit_window.destroy()
+                self.show_table_data(table_name)  # Обновляем данные в таблице
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
+        ttk.Button(edit_window, text="Сохранить изменения", command=save_changes).pack()
 
     def add_new_record(self):
         self.clear_widgets()
+
         ttk.Label(self.root, text="Выберите таблицу для добавления записи:").pack(pady=10)
         
         self.cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
         tables = [table[0] for table in self.cursor.fetchall()]
         table_combo = ttk.Combobox(self.root, values=tables, state="readonly")
         table_combo.pack(pady=10)
-        ttk.Button(self.root, text="Назад", command=self.display_options).pack(pady=10)
-        
+
         entry_frame = ttk.Frame(self.root)
         entry_frame.pack(pady=20)
+
+        entries = {}  # Для хранения объектов Entry
 
         def on_table_select(event):
             table_name = table_combo.get()
             self.cursor.execute(f"SELECT * FROM {table_name} LIMIT 0")
             columns = [desc[0] for desc in self.cursor.description]
-            entries = {}
             
+            # Очистка старых виджетов
             for widget in entry_frame.winfo_children():
                 widget.destroy()
-            #
+
+            # Создание новых Entry для каждого столбца
             for column in columns:
                 ttk.Label(entry_frame, text=column).pack()
-                if table_name == "Личные_данные" and column == "Телефон":
-                    # Создаем ползунок для ввода номера телефона
-                    phone_number_slider = tk.Scale(
-                        entry_frame, from_=1000000000, to=9999999999, 
-                        orient='horizontal', resolution=1, length=400, width=20
-                        )                    
-                    phone_number_slider.pack(pady=10)
-                    entries[column] = phone_number_slider
-                else:
-                    entry = ttk.Entry(entry_frame)
-                    entry.pack()
-                    entries[column] = entry
+                entry = ttk.Entry(entry_frame)
+                entry.pack()
+                entries[column] = entry
 
-            def insert_data():
-                columns_part = ", ".join(columns)
-                values_part = ", ".join(['%s' for _ in columns])
-                values = []
-                for col in columns:
-                    if isinstance(entries[col], tk.Scale):
-                        # Обработка значения ползунка для номера телефона
-                        values.append(str(entries[col].get()))
-                    else:
-                        values.append(entries[col].get())
-                insert_query = f"INSERT INTO {table_name} ({columns_part}) VALUES ({values_part})"
-                try:
-                    self.cursor.execute(insert_query, values)
-                    self.connection.commit()
-                    messagebox.showinfo("Успех", "Запись успешно добавлена")
-                except Exception as e:
-                    messagebox.showerror("Ошибка при добавлении данных", str(e))
-
-            ttk.Button(entry_frame, text="Добавить запись", command=insert_data).pack(pady=20)
-            ttk.Button(self.root, text="Назад", command=self.display_options).pack(pady=10)
+        def insert_data():
+            table_name = table_combo.get()
+            columns = list(entries.keys())
+            values = [entry.get() for entry in entries.values()]
+            
+            query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(['%s' for _ in values])})"
+            try:
+                self.cursor.execute(query, values)
+                self.connection.commit()
+                messagebox.showinfo("Success", "Record added successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to add record: {str(e)}")
 
         table_combo.bind('<<ComboboxSelected>>', on_table_select)
+        ttk.Button(self.root, text="Добавить запись", command=insert_data).pack(pady=10)
+        ttk.Button(self.root, text="Back", command=self.display_options).pack(pady=10)
+
     def execute_sql_query(self):
         self.clear_widgets()
         # Создание виджетов для ввода SQL запроса
