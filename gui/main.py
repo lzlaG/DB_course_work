@@ -133,7 +133,7 @@ class PostgreSQLApp(tk.Frame):
                         self.cursor.execute(delete_query, (data[0],))
                         self.connection.commit()
                         table.delete(selected_item)
-                        messagebox.showinfo("Success", "Record Deleted Successfully")
+                        messagebox.showinfo("Success", "Запись удаленна успешно")
                     except Exception as e:
                         messagebox.showerror("Error", str(e))
 
@@ -163,7 +163,7 @@ class PostgreSQLApp(tk.Frame):
             try:
                 self.cursor.execute(update_query, values)
                 self.connection.commit()
-                messagebox.showinfo("Success", "Record Updated Successfully")
+                messagebox.showinfo("Success", "Запись обновленна успешна")
                 edit_window.destroy()
                 self.show_table_data(table_name)  # Обновляем данные в таблице
             except Exception as e:
@@ -211,7 +211,7 @@ class PostgreSQLApp(tk.Frame):
             try:
                 self.cursor.execute(query, values)
                 self.connection.commit()
-                messagebox.showinfo("Success", "Record added successfully!")
+                messagebox.showinfo("Success", "Запись добавлена успешно!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to add record: {str(e)}")
 
